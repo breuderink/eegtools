@@ -2,10 +2,11 @@ Introduction
 ============
 
 EEGtools is a set of Python libraries for EEG analysis. Most of the code was
-developed as a part of the PhD work of Boris Reuderink in the form of the
-library "Psychic". EEGtools is the successor of Psychic, and does not attempt
-to provide a framework for analysis, but a small set of well-tested functions
-for scientific EEG analysis.
+developed as a part of the PhD work of [Boris
+Reuderink](http://borisreuderink.nl) in the form of the library
+"[Psychic](http://code.google.com/p/psychicml)". EEGtools is the successor of
+Psychic, and does not attempt to provide a framework for analysis, but a small
+set of well-tested functions for scientific EEG analysis.
 
 Features
 ========
@@ -19,4 +20,4 @@ Features
 Status
 ======
 EEGtools is currently in the planning phase. Most code does already exist
-though.
+in [Psychic](http://code.google.com/p/psychicml).
