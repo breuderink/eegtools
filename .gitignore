@@ -1,5 +1,5 @@
 MANIFEST
 build/*
 dist/*
-*.*.swp
 *.pyc
+*.*.swp

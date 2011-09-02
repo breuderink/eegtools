@@ -7,8 +7,9 @@ setup(
   author_email='b.reuderink@gmail.com',
   license='BSD',
   version='0.1dev',
-  packages=['eegtools'],
   requires=[ # FIXME does this work? docs seem inconsistent....
     'numpy(>=1.5.1)',
     ],
+  packages=['eegtools', 'eegtools.io'],
+  license='BSD',
   )
