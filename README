@@ -6,7 +6,7 @@ developed as a part of the PhD work of [Boris
 Reuderink](http://borisreuderink.nl) in the form of the library
 "[Psychic](https://github.com/breuderink/psychic)". EEGtools is the successor of
 Psychic, and does not attempt to provide a framework for analysis, but a small
-set of well-tested functions for scientific EEG analysis.
+set of well-tested functions for scientific EEG analyses.
 
 Features
 ========
