@@ -11,5 +11,4 @@ setup(
     'numpy(>=1.5.1)',
     ],
   packages=['eegtools', 'eegtools.io'],
-  license='BSD',
   )
