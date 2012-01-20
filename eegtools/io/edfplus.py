@@ -149,23 +149,44 @@ class BaseEDFReader:
       pass
 
 
-def load_edf(edf):
+def load_edf(edffile):
   '''Load an EDF+ file.
 
   Very basic reader for EDF and EDF+ files. While BaseEDFReader does support
   exotic features like non-homogeneous sample rates and loading only parts of
   the stream, load_edf expects a single fixed sample rate for all channels and
   tries to load the whole file.
+
+  Parameters
+  ----------
+  edffile : file-like object or string
+
+  Returns
+  -------
+  Named tuple with the fields:
+    X : NumPy array with shape p by n.
+      Raw recording of n samples in p dimensions.
+    sample_rate : float
+      The sample rate of the recording. Note that mixed sample-rates are not
+      supported.
+    sens_lab : list of length p with strings
+      The labels of the sensors used to record X.
+    time : NumPy array with length n
+      The time offset in the recording for each sample.
+    annotations : a list with tuples
+      EDF+ annotations are stored in (start, duration, description) tuples.
+      start : float
+        Indicates the start of the event in seconds.
+      duration : float
+        Indicates the duration of the event in seconds.
+      description : list with strings
+        Contains (multiple?) descriptions of the annotation event.
   '''
-  # TODO: support loading from file handle (e.g. within tar file)
+  if isinstance(edffile, basestring):
+    with open(edffile, 'rb') as f:
+      return load_edf(f)  # convert filename to file
 
-  if isinstance(edf, basestring):
-    # convert filename to file
-    with open(edf, 'rb') as f:
-      return load_edf(f)
-
-
-  reader = BaseEDFReader(edf)
+  reader = BaseEDFReader(edffile)
   reader.read_header()
 
   h = reader.header
