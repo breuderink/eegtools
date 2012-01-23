@@ -202,7 +202,7 @@ def load_edf(edffile):
   rectime, X, annotations = zip(*reader.records())
   X = np.hstack(X)
   annotations = reduce(operator.add, annotations)
-  sens_lab = [lab for lab in reader.header['label'] if lab != EVENT_CHANNEL]
+  chan_lab = [lab for lab in reader.header['label'] if lab != EVENT_CHANNEL]
 
   # create timestamps
   if reader.header['contiguous']:
@@ -212,5 +212,5 @@ def load_edf(edffile):
     within_rec_time = np.linspace(0, reclen, nsamp, endpoint=False)
     time = np.hstack([t + within_rec_time for t in rectime])
 
-  tup = namedtuple('EDF', 'X sample_rate sens_lab time annotations')
-  return tup(X, sample_rate, sens_lab, time, annotations)
+  tup = namedtuple('EDF', 'X sample_rate chan_lab time annotations')
+  return tup(X, sample_rate, chan_lab, time, annotations)
