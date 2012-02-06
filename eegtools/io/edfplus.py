@@ -2,7 +2,9 @@
 Reader for EDF+ files.
 TODO:
  - add support for log-transformed channels:
-   http://www.edfplus.info/specs/edffloat.html,
+   http://www.edfplus.info/specs/edffloat.html and test with 
+   data generated with 
+   http://www.edfplus.info/downloads/software/NeuroLoopGain.zip.
  - check annotations with Schalk's Physiobank data.
 
 Copyright (c) 2012 Boris Reuderink.
