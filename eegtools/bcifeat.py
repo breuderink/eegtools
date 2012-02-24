@@ -19,6 +19,17 @@ def spec(X):
     detrend(X, axis=1) * np.atleast_2d(np.hanning(X.shape[1])))
 
 
+def specweight(n, fs, band, bleed=7):
+  '''Construct weight vector for FFT-based filtering.'''
+  # construct brick-wall response
+  freq = np.fft.fftfreq(n, 1./fs)
+  response = np.where(np.logical_and(freq >= band[0], freq < band[1]), 1, 0)
+
+  # smooth spectrum to prevent ringing
+  win = np.hanning(bleed)
+  return np.convolve(response, win/np.sum(win), 'same')
+
+
 def bandcov(bf):
   '''
   Rank-2 covariance matrix for matching DFT coefficients of sensors. Used in
@@ -45,7 +56,7 @@ def covtens(T):
   [1] Jason Farquhar. A linear feature space for simultaneous learning of
   spatio-spectral filters in BCI. Neural Networks, 22:1278--1285, 2009.
   '''
-  T = np.copy(np.atleast_2d(T))
+  T = np.atleast_2d(T)
   C = np.asarray([bandcov(T[:, i]) for i in range(T.shape[1])])
   return C / T.shape[1]**2
 
