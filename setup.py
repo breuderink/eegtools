@@ -9,6 +9,7 @@ setup(
   version='0.1dev',
   requires=[ # FIXME does this work? docs seem inconsistent....
     'numpy(>=1.5.1)',
+    'scipy'
     ],
   packages=['eegtools', 'eegtools.io'],
   )

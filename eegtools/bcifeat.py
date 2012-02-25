@@ -2,24 +2,20 @@
 # License: BSD
 import logging
 import numpy as np
+from scipy import signal
 
 log = logging.getLogger(__name__)
 
-def detrend(y, degree=1):
-  '''Numpy based detrender.'''
-  y = np.atleast_1d(y)
-  x = np.arange(y.size)
-  return y - np.polyval(np.polyfit(x, y, deg=degree), x)
+
+def spec(T, axis=0):
+  '''Combined detrending, windowing and real-valued FFT over axis.'''
+  T = signal.detrend(T, axis=axis)
+  win = np.hanning(T.shape[axis])
+  win.shape = (np.where(np.arange(T.ndim) == axis, -1, 1))
+  return np.fft.rfft(T * win, axis=axis)
 
 
-def spec(X):
-  '''Combined detrending, windowing and real-valued FFT over rows.'''
-  X = np.atleast_2d(X)
-  return np.fft.rfft(
-    detrend(X, axis=1) * np.atleast_2d(np.hanning(X.shape[1])))
-
-
-def specweight(n, fs, band, bleed=7):
+def spec_weight(n, fs, band, bleed=7):
   '''Construct weight vector for FFT-based filtering.'''
   # construct brick-wall response
   freq = np.fft.fftfreq(n, 1./fs)
@@ -30,7 +26,7 @@ def specweight(n, fs, band, bleed=7):
   return np.convolve(response, win/np.sum(win), 'same')
 
 
-def bandcov(bf):
+def band_cov(bf):
   '''
   Rank-2 covariance matrix for matching DFT coefficients of sensors. Used in
   covtens().
@@ -38,7 +34,7 @@ def bandcov(bf):
   return np.real(np.outer(bf, bf.conj()))
 
 
-def covtens(T):
+def cov_tens(T):
   '''
   Covariance tensor for real DFT-ed trial (p x n) matrix T. An (n x p x p)
   tensor C is returned. The idea of constructing a tensor with covariance
@@ -57,7 +53,7 @@ def covtens(T):
   spatio-spectral filters in BCI. Neural Networks, 22:1278--1285, 2009.
   '''
   T = np.atleast_2d(T)
-  C = np.asarray([bandcov(T[:, i]) for i in range(T.shape[1])])
+  C = np.asarray([band_cov(T[:, i]) for i in range(T.shape[1])])
   return C / T.shape[1]**2
 
 

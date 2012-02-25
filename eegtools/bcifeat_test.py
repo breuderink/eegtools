@@ -1,25 +1,21 @@
 # Copyright (c) 2011 Boris Reuderink
 # License: BSD
 import numpy as np
+from scipy import signal
 import bcifeat as bf
 
 
-def test_detrend():
-  x = np.linspace(0, 1, 1000)
-  p0, p1, p2 = 20, 10 * x, 10 * x**2
-  y = np.cos(x * 10 * 2 * np.pi)
+def test_spec():
+  def spec(x):
+    return np.fft.rfft(signal.detrend(x) * np.hanning(x.size))
 
-  # test detrending precision
-  np.testing.assert_almost_equal(bf.detrend(y), y, decimal=3)
-  np.testing.assert_almost_equal(bf.detrend(y + p0), y, decimal=3)
-  np.testing.assert_almost_equal(bf.detrend(y + p1), y, decimal=3)
-  np.testing.assert_almost_equal(bf.detrend(y + p2, degree=2), y, decimal=1)
-
-  # test default degree
-  np.testing.assert_equal(bf.detrend(y + p2), bf.detrend(y + p2, degree=1))
+  T = np.random.randn(10, 20, 30) + 40
+  for ax in range(3):
+    S = bf.spec(T, axis=ax)
+    np.testing.assert_almost_equal(S, np.apply_along_axis(spec, ax, T))
 
 
-def test_specweight():
+def test_spec_weight():
   '''Test spectral band-pass weight for FFT filtering.'''
   def osc(f, fs):
     return np.sin(f * np.linspace(0, 2 * np.pi, fs))
@@ -29,7 +25,7 @@ def test_specweight():
   for rate in test_rate:
     for (low, high) in test_bands:
       print 'rate: %d, [%d, %d]' % (rate, low, high)
-      weight = bf.specweight(rate, rate, [low, high])
+      weight = bf.spec_weight(rate, rate, [low, high])
 
       probes = [low - 1 , low + 1, np.mean([low, high]), high - 1, high + 1]
       resp = [np.linalg.norm(weight * np.fft.fft(osc(p, rate)))
@@ -39,7 +35,7 @@ def test_specweight():
       assert np.all(resp[-1] < resp[1:-1]), 'high freqs not suppressed!'
   
 
-def test_bandcov():
+def test_band_cov():
   p, n = 10, 256
   tr_f = np.apply_along_axis(np.fft.rfft, 1, np.random.randn(p, n))
   for freq in range(1, tr_f.shape[1]):
@@ -49,7 +45,7 @@ def test_bandcov():
     tr = np.apply_along_axis(np.fft.irfft, 1, tr_b)
 
     # calculate normal and DFT based covariance
-    Cf = bf.bandcov(tr_f[:,freq])
+    Cf = bf.band_cov(tr_f[:,freq])
     C = np.cov(tr, bias=True)
 
     # normalize
@@ -59,10 +55,10 @@ def test_bandcov():
     np.testing.assert_almost_equal(k * Cf, C)
 
 
-def test_covtens():
+def test_cov_tens():
   p, n = 12, 128
   X = np.random.randn(p, n)
-  T = bf.covtens(np.fft.fft(X))
+  T = bf.cov_tens(np.fft.fft(X))
   np.testing.assert_almost_equal(np.sum(T[1:], 0), np.cov(X, bias=True))
 
 
