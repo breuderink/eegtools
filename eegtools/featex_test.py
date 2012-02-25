@@ -2,7 +2,7 @@
 # License: BSD
 import numpy as np
 from scipy import signal
-import bcifeat as bf
+import featex as fe
 
 
 def test_spec():
@@ -11,7 +11,7 @@ def test_spec():
 
   T = np.random.randn(10, 20, 30) + 40
   for ax in range(3):
-    S = bf.spec(T, axis=ax)
+    S = fe.spec(T, axis=ax)
     np.testing.assert_almost_equal(S, np.apply_along_axis(spec, ax, T))
 
 
@@ -25,7 +25,7 @@ def test_spec_weight():
   for rate in test_rate:
     for (low, high) in test_bands:
       print 'rate: %d, [%d, %d]' % (rate, low, high)
-      weight = bf.spec_weight(rate, rate, [low, high])
+      weight = fe.spec_weight(rate, rate, [low, high])
 
       probes = [low - 1 , low + 1, np.mean([low, high]), high - 1, high + 1]
       resp = [np.linalg.norm(weight * np.fft.fft(osc(p, rate)))
@@ -45,7 +45,7 @@ def test_band_cov():
     tr = np.apply_along_axis(np.fft.irfft, 1, tr_b)
 
     # calculate normal and DFT based covariance
-    Cf = bf.band_cov(tr_f[:,freq])
+    Cf = fe.band_cov(tr_f[:,freq])
     C = np.cov(tr, bias=True)
 
     # normalize
@@ -58,13 +58,13 @@ def test_band_cov():
 def test_cov_tens():
   p, n = 12, 128
   X = np.random.randn(p, n)
-  T = bf.cov_tens(np.fft.fft(X))
+  T = fe.cov_tens(np.fft.fft(X))
   np.testing.assert_almost_equal(np.sum(T[1:], 0), np.cov(X, bias=True))
 
 
 def test_whitener():
   Sig = np.cov(np.random.rand(10, 100))
-  W = bf.whitener(Sig)
+  W = fe.whitener(Sig)
   np.testing.assert_almost_equal(reduce(np.dot, [W.T, Sig, W]), np.eye(10))
 
 
@@ -72,5 +72,5 @@ def test_whitener_lowrank():
   '''Test whitener with low-rank covariance matrix'''
   Sig = np.eye(10)
   Sig[0, 0] = 0
-  W = bf.whitener(Sig)
+  W = fe.whitener(Sig)
   np.testing.assert_almost_equal(reduce(np.dot, [W.T, Sig, W]), Sig)

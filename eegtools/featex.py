@@ -44,7 +44,7 @@ def cov_tens(T):
 
   >>> p, n = 10, 128
   >>> X = np.random.randn(p, n)
-  >>> T = covtens(np.fft.fft(X, axis=1))
+  >>> T = cov_tens(np.fft.fft(X, axis=1))
   >>> Sig = np.sum(T[1:], 0)
   >>> C = np.cov(X, bias=True)
   >>> np.testing.assert_almost_equal(Sig, C)
