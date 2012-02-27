@@ -5,6 +5,15 @@ from scipy import signal
 import featex as fe
 
 
+def test_window():
+  X = np.random.randn(3, 50)
+  W = fe.windows([10, 12], [-2, 3], X)
+
+  assert(W.shape[0] == 2)
+  np.testing.assert_equal(W[0], X[:,8:13])
+  np.testing.assert_equal(W[1], X[:,10:15])
+
+
 def test_spec():
   def spec(x):
     return np.fft.rfft(signal.detrend(x) * np.hanning(x.size))

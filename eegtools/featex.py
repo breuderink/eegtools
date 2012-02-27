@@ -1,10 +1,24 @@
-# Copyright (c) 2011 Boris Reuderink
+# Copyright (c) 2012 Boris Reuderink
 # License: BSD
 import logging
 import numpy as np
 from scipy import signal
 
+
 log = logging.getLogger(__name__)
+
+
+def windows(indices, offset, X):
+  '''Cut windows specified by indices from X with offsets.'''
+  # construct vector y and tensor T
+  indices = np.atleast_1d(indices)
+  start, end = offset
+
+  T = np.zeros((indices.size, X.shape[0], end-start)) * np.nan
+  for ti, i in enumerate(indices):
+    T[ti] = X[:,(i+start):(i+end)]
+
+  return T
 
 
 def spec(T, axis=0):
