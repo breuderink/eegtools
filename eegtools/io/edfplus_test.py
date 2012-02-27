@@ -10,7 +10,8 @@ def test_with_generate_edf():
   is separately tested, *but not from a real file*!.
   '''
   reader = edfplus.BaseEDFReader(
-    open(os.path.join('test', 'data', 'sine3Hz_block0.2Hz.edf'), 'rb'))
+    open(os.path.join(os.path.dirname(__file__), 
+    'data', 'sine3Hz_block0.2Hz.edf'), 'rb'))
   reader.read_header()
 
   h = reader.header
@@ -63,7 +64,8 @@ def test_edfplus_tal():
 
 def test_load_edf():
   '''Test high-level edf-loading interface.'''
-  fname = os.path.join('test', 'data', 'kemp-positive_spikes.edf')
+  fname = os.path.join(os.path.dirname(__file__), 
+    'data', 'kemp-positive_spikes.edf')
   X, sample_rate, sens_lab, time, annotations = edfplus.load_edf(fname)
   np.testing.assert_almost_equal(np.flatnonzero(X), np.arange(12) * 100)
 
