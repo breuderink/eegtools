@@ -71,15 +71,3 @@ def test_cov_tens():
   np.testing.assert_almost_equal(np.sum(T[1:], 0), np.cov(X, bias=True))
 
 
-def test_whitener():
-  Sig = np.cov(np.random.rand(10, 100))
-  W = fe.whitener(Sig)
-  np.testing.assert_almost_equal(reduce(np.dot, [W.T, Sig, W]), np.eye(10))
-
-
-def test_whitener_lowrank():
-  '''Test whitener with low-rank covariance matrix'''
-  Sig = np.eye(10)
-  Sig[0, 0] = 0
-  W = fe.whitener(Sig)
-  np.testing.assert_almost_equal(reduce(np.dot, [W.T, Sig, W]), Sig)
