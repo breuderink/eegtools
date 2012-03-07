@@ -1,5 +1,5 @@
 import numpy as np
-from shared import Recording, cache_path
+import shared
 
 def test_recording_construction():
   p, n = 32, 100
@@ -17,7 +17,7 @@ def test_recording_construction():
   event_lab = {0 : 'zero', 1 : 'one', 2 : 'two'}
   folds = [0, 0, 1, 1]
 
-  r = Recording(X=X, 
+  r = shared.Recording(X=X, 
     chan_lab=chan_lab, 
     dt=dt, 
     events=events, 
@@ -52,13 +52,15 @@ def test_cache_path():
   try:
     tmpdir = tempfile.mkdtemp()
     os.environ['BCIDATA_CACHE'] = tmpdir
-    assert cache_path() == tmpdir
-    print os.path.join(cache_path(), 'README.txt')
-    assert os.path.exists(os.path.join(cache_path(), 'README.txt'))
+    assert shared.make_cache_path(shared.get_cache_path()) == tmpdir
+
+    readme_fname = os.path.join(shared.get_cache_path(), 'README.txt')
+    print readme_fname
+    assert os.path.exists(readme_fname)
   finally:
     os.remove(os.path.join(tmpdir, 'README.txt')); 
     os.rmdir(tmpdir)
 
   # test default cache path
   del os.environ['BCIDATA_CACHE']
-  assert cache_path() == os.path.expanduser('~/bcidata_cache')
+  assert shared.get_cache_path() == os.path.expanduser('~/bcidata_cache')

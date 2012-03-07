@@ -140,14 +140,14 @@ def print_story(events, sample_rate):
 
 
 def data_source():
-  return np.DataSource(cache_path())
+  return np.DataSource(make_cache_path(get_cache_path()))
 
 
-def cache_path():
-  '''Create path for caching downloaded files. The location is
-  indicated by the BCIDATA_CACHE environment variable. When the path
-  does not exist, it is created and a README.txt with instructions is
-  written to this location.
+def get_cache_path():
+  '''Get path for caching downloaded files. The location is indicated
+  by the BCIDATA_CACHE environment variable. When the path does not
+  exist, it is created and a README.txt with instructions is written
+  to this location.
 
   Returns a string containing the path.
   '''
@@ -155,6 +155,16 @@ def cache_path():
   if 'BCIDATA_CACHE' in os.environ:
     path = os.environ['BCIDATA_CACHE']
 
+  return path
+
+
+def make_cache_path(path):
+  '''Create path for caching downloaded files. When the path does not
+  exist it is created, and a README.txt with instructions is written
+  to this location.
+
+  Returns a string containing the path.
+  '''
   if not os.path.exists(path):
     os.makedirs(path)
 
@@ -163,7 +173,7 @@ def cache_path():
     with open(readme, 'w') as f:
       f.write(textwrap.dedent(
         '''\
-        This directory was created by bcidata to cache downloaded BCI
+        This directory was created by eegtools to cache downloaded BCI
         datasets. It is safe to remove the cached files in this
         directory, but doing so will result in a performance penalty.
 
