@@ -51,7 +51,7 @@ def test_cache_path():
   # create new cache path
   try:
     tmpdir = tempfile.mkdtemp()
-    os.environ['BCIDATA_CACHE'] = tmpdir
+    os.environ['EEGTOOLS_DATA_CACHE'] = tmpdir
     assert shared.make_cache_path(shared.get_cache_path()) == tmpdir
 
     readme_fname = os.path.join(shared.get_cache_path(), 'README.txt')
@@ -62,5 +62,5 @@ def test_cache_path():
     os.rmdir(tmpdir)
 
   # test default cache path
-  del os.environ['BCIDATA_CACHE']
-  assert shared.get_cache_path() == os.path.expanduser('~/bcidata_cache')
+  del os.environ['EEGTOOLS_DATA_CACHE']
+  assert shared.get_cache_path() == os.path.expanduser('~/eegdata_cache')
