@@ -1,6 +1,5 @@
 import numpy as np
-import shared
-
+import shared 
 def test_recording_construction():
   p, n = 32, 100
   X = np.zeros((p, n))
@@ -63,4 +62,4 @@ def test_cache_path():
 
   # test default cache path
   del os.environ['EEGTOOLS_DATA_CACHE']
-  assert shared.get_cache_path() == os.path.expanduser('~/eegdata_cache')
+  assert shared.get_cache_path() == os.path.expanduser('~/eegtools_data')

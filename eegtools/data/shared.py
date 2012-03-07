@@ -2,6 +2,7 @@ import os
 import textwrap
 import warnings
 import numpy as np
+
 '''
 EEGdata provides easy access to neurophysiological recordings, with
 brain-computer interface (BCI) research in mind. In short, a BCI is
@@ -11,6 +12,11 @@ The aim is to make publicly available datasets available to
 researchers by automatically downloading and parsing them, and provide
 the data in a no-frills format.
 '''
+
+
+CACHE_VAR = 'EEGTOOLS_DATA_CACHE'
+CACHE_PATH = '~/eegtools_data'
+
 
 class Recording:
   '''
@@ -151,11 +157,7 @@ def get_cache_path():
 
   Returns a string containing the path.
   '''
-  path = os.path.expanduser('~/eegdata_cache')
-  if 'EEGTOOLS_DATA_CACHE' in os.environ:
-    path = os.environ['EEGTOOLS_DATA_CACHE']
-
-  return path
+  return os.environ.get(CACHE_VAR, os.path.expanduser(CACHE_PATH))
 
 
 def make_cache_path(path):
@@ -177,10 +179,12 @@ def make_cache_path(path):
         datasets. It is safe to remove the cached files in this
         directory, but doing so will result in a performance penalty.
 
-        To change the default path, set the EEGTOOLS_DATA_CACHE environment
-        variable. For example:
+        To change this path, set the %(env)s environment variable with
+        the path of your preference. For example:
         
-            $ export EEGTOOLS_DATA_CACHE=~/data/eegdata_cache
-        '''))
+            $ export %(env)s=%(cache_path)s
+
+        That is all.
+        ''' % dict(env=CACHE_VAR, cache_path=CACHE_PATH)))
 
   return path
