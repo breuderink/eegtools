@@ -92,7 +92,7 @@ def block_to_events(I):
 
   events = np.array(events, int).T
 
-  # remove events for condition with full control
+  # remove events marking the condition with full control
   events = events[:,~np.logical_and(events[0] == 90, events[3] == 0)]
   events[3, events[0] == 90] = 0
   return events
@@ -100,7 +100,7 @@ def block_to_events(I):
 
 
 def load(subject_id, ds=data_source()):
-  matfile = ds.open(URL_TEMPLATE  % subject_id)
+  matfile = ds.open(URL_TEMPLATE % subject_id)
   mat = io.loadmat(matfile, struct_as_record=True)
 
   X = mat['X'].astype(np.float32)
