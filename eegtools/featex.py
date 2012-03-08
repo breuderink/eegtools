@@ -30,7 +30,8 @@ def spec(T, axis=0):
 
 
 def spec_weight(n, fs, band, bleed=7):
-  '''Construct weight vector for FFT-based filtering.'''
+  '''Construct weight vector for FFT-based filtering.
+  TODO: Warn for difference between real FFT and FFT!'''
   # construct brick-wall response
   freq = np.fft.fftfreq(n, 1./fs)
   response = np.where(np.logical_and(freq >= band[0], freq < band[1]), 1, 0)
