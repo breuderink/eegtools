@@ -51,6 +51,8 @@ def test_cache_path():
   try:
     tmpdir = tempfile.mkdtemp()
     os.environ['EEGTOOLS_DATA_CACHE'] = tmpdir
+
+    os.rmdir(tmpdir)  # make path non-existent
     assert shared.make_cache_path(shared.get_cache_path()) == tmpdir
 
     readme_fname = os.path.join(shared.get_cache_path(), 'README.txt')
