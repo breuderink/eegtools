@@ -9,7 +9,45 @@ log = logging.getLogger(__name__)
 
 
 def windows(indices, offset, X):
-  '''Cut windows specified by indices from X with offsets.'''
+  '''Cut windows specified by indices from X with offsets.
+
+  Cut windows from a multivariate time series. This can be used to
+  extract a sliding window over the data, or the extract trials for
+  neurophysiological experiments from a continuous recording.
+
+  Parameters
+  ----------
+  indices : list or array with ints
+      The indices of X that are of interest for the window. The
+      indices do not necessarily have to indicate the begin or center
+      of the window, since offsets relative to the indices determine
+      the window placement.
+  offset : tuple with ints (start, end)
+      The start and end of the window relative to the index of the
+      event. A negative start can be used for example to extract a
+      baseline before an event.
+  X : 2D array-like
+      The continuous array from which windows of the horizontal axis
+      are selected.
+  
+  Returns
+  -------
+  out : nd_array
+    A 3D array, with the first dimension indexing the different
+    windows.
+
+  Examples
+  --------
+  >>> X = np.arange(60).reshape(2, 30)
+  >>> T = windows([10, 15, 20], [-2, 4], X)
+  >>> T.shape
+  (3, 2, 6)
+
+  >>> T[0]
+  array([[  8.,   9.,  10.,  11.,  12.,  13.],
+         [ 38.,  39.,  40.,  41.,  42.,  43.]])
+  '''
+
   # construct vector y and tensor T
   indices = np.atleast_1d(indices)
   start, end = offset
@@ -22,16 +60,65 @@ def windows(indices, offset, X):
 
 
 def spec(T, axis=0):
-  '''Combined detrending, windowing and real-valued FFT over axis.'''
+  '''Combined detrending, windowing and real-valued FFT over axis.
+
+  Usually, the FFT is preceded by a detrending and windowing to reduce
+  edge effects. This function performs the detrending, windowing and
+  real-valued FFT.
+
+  Parameters
+  ----------
+  T : ndarray 
+      Tensor containing data to be detrended.
+  axis : int, optional
+      Specifies the axis over which the spectrum is calculated.
+
+  Returns
+  -------
+  out: ndarray
+    Array similar to `T` where the time dimension is replace with
+    it's frequency spectrum.
+  '''
   T = signal.detrend(T, axis=axis)
   win = np.hanning(T.shape[axis])
   win.shape = (np.where(np.arange(T.ndim) == axis, -1, 1))
   return np.fft.rfft(T * win, axis=axis)
 
 
-def spec_weight(n, fs, band, bleed=7):
-  '''Construct weight vector for FFT-based filtering.
-  TODO: Warn for difference between real FFT and FFT!'''
+def spec_weight(n, fs, hp=None, lp=None, bleed=7):
+  '''Construct weight vector for real-valued FFT-based filtering.
+
+  A simple band-pass filter can be implemented by weighting the
+  spectrum of a signal. This function returns a vector with spectrum
+  weights for band-pass filtering. 
+
+
+  Parameters
+  ----------
+  n : int
+    The length of the signal.
+  fs : int
+    The sampling rate of the window in Hz.
+  hp : float, optional
+    The cut-off value in Hz for the low-pass filter.
+  lp : float, optional
+    The cut-off value in Hz for the high-pass filter.
+  bleed : int, optional
+    The length of the Hanning window that is convolved with the
+    brick-wall filter to smooth the filter response.
+
+  Returns
+  -------
+  out : ndarray
+    Vector with weights for increasing frequencies, to be multiplied
+    with real-valued DFT-ed data.
+
+  Examples
+  --------
+  >>> assert False
+  
+  '''
+
   # construct brick-wall response
   freq = np.fft.fftfreq(n, 1./fs)
   response = np.where(np.logical_and(freq >= band[0], freq < band[1]), 1, 0)
