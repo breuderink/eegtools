@@ -9,6 +9,8 @@ def test_window():
   X = np.random.randn(3, 50)
   W = fe.windows([10, 12], [-2, 3], X)
 
+  # FIXME: we don't define behaviour when the windows are partially within X.
+
   assert(W.shape[0] == 2)
   np.testing.assert_equal(W[0], X[:,8:13])
   np.testing.assert_equal(W[1], X[:,10:15])
@@ -23,26 +25,27 @@ def test_spec():
     S = fe.spec(T, axis=ax)
     np.testing.assert_almost_equal(S, np.apply_along_axis(spec, ax, T))
 
-
 def test_spec_weight():
-  '''Test spectral band-pass weight for FFT filtering.'''
-  def osc(f, fs):
-    return np.sin(f * np.linspace(0, 2 * np.pi, fs))
+  freqs = np.fft.fftfreq(128, d=1./128)
+  for bleed in [3, 7, 15, 30]:
+    print 'bleed = %d.' % bleed
+    lp = fe.spec_weight(freqs, lp=30., bleed=bleed)
+    hp = fe.spec_weight(freqs, hp=7., bleed=bleed)
+    bp = fe.spec_weight(freqs, lp=30., hp=7, bleed=bleed)
 
-  test_bands = [(2, 8), (8, 30), (30, 40)]
-  test_rate = [128, 256]
-  for rate in test_rate:
-    for (low, high) in test_bands:
-      print 'rate: %d, [%d, %d]' % (rate, low, high)
-      weight = fe.spec_weight(rate, rate, [low, high])
+    print np.vstack([freqs, lp, hp, bp]).T
 
-      probes = [low - 1 , low + 1, np.mean([low, high]), high - 1, high + 1]
-      resp = [np.linalg.norm(weight * np.fft.fft(osc(p, rate)))
-        for p in probes]
-      print np.asarray([probes, resp]).round(3)
-      assert np.all(resp[0] < resp[1:-1]), 'low freqs not suppressed!'
-      assert np.all(resp[-1] < resp[1:-1]), 'high freqs not suppressed!'
-  
+    # test lp
+    np.testing.assert_almost_equal(lp[np.abs(freqs)<= 30-bleed/2], 1)
+    np.testing.assert_almost_equal(lp[np.abs(freqs)>= 30+bleed/2], 0)
+    
+    # test hp
+    np.testing.assert_almost_equal(hp[np.abs(freqs)<= 7-bleed/2], 0)
+    np.testing.assert_almost_equal(hp[np.abs(freqs)>= 7+bleed/2], 1)
+
+    # test bp
+    np.testing.assert_almost_equal(bp, np.min([hp, bp], axis=0))
+
 
 def test_band_cov():
   p, n = 10, 256

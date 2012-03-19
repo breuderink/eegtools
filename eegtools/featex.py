@@ -85,18 +85,17 @@ def spec(T, axis=0):
   return np.fft.rfft(T * win, axis=axis)
 
 
-def spec_weight(n, fs, hp=None, lp=None, bleed=7):
-  '''Construct weight vector for real-valued FFT-based filtering.
+def spec_weight(freqs, hp=None, lp=None, bleed=7):
+  '''Construct weight vector for filtering in the frequency domain.
 
-  A simple band-pass filter can be implemented by weighting the
+  A simple spectral filter can be implemented by weighting the
   spectrum of a signal. This function returns a vector with spectrum
-  weights for band-pass filtering. 
-
+  weights. 
 
   Parameters
   ----------
-  n : int
-    The length of the signal.
+  freqs : array-like
+    The frequency of the DFT bins.
   fs : int
     The sampling rate of the window in Hz.
   hp : float, optional
@@ -118,14 +117,20 @@ def spec_weight(n, fs, hp=None, lp=None, bleed=7):
   >>> assert False
   
   '''
+  freqs = np.abs(freqs)  # Make filter symmetrical for negative frequencies.
 
   # construct brick-wall response
-  freq = np.fft.fftfreq(n, 1./fs)
-  response = np.where(np.logical_and(freq >= band[0], freq < band[1]), 1, 0)
+  response = np.ones(freqs.size)
+  if lp:
+    response[freqs > lp] = 0.
+  if hp:
+    response[freqs < hp] = 0.
 
   # smooth spectrum to prevent ringing
-  win = np.hanning(bleed)
-  return np.convolve(response, win/np.sum(win), 'same')
+  win, pad = np.hanning(bleed), np.ones(bleed)
+  padded = np.hstack([pad * response[0], response, pad * response[-1]])
+  response = np.convolve(padded, win/np.sum(win), 'same')
+  return response[pad.size:-pad.size]
 
 
 def band_cov(bf):
