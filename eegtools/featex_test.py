@@ -17,13 +17,13 @@ def test_window():
 
 
 def test_spec():
-  def spec(x):
+  def spec_1d(x):
     return np.fft.rfft(signal.detrend(x) * np.hanning(x.size))
 
   T = np.random.randn(10, 20, 30) + 40
   for ax in range(3):
     S = fe.spec(T, axis=ax)
-    np.testing.assert_almost_equal(S, np.apply_along_axis(spec, ax, T))
+    np.testing.assert_almost_equal(S, np.apply_along_axis(spec_1d, ax, T))
 
 
 def test_spec_weight():

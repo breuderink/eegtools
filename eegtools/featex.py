@@ -95,7 +95,7 @@ def spec_weight(freqs, hp=None, lp=None, bleed=7):
   Parameters
   ----------
   freqs : array-like
-    The frequency of the DFT bins.
+    The frequency of the DFT bins, for example from numpy.fft.fftfreq
   fs : int
     The sampling rate of the window in Hz.
   hp : float, optional
@@ -114,17 +114,34 @@ def spec_weight(freqs, hp=None, lp=None, bleed=7):
 
   Examples
   --------
-  >>> assert False
-  
+  >>> freq = np.fft.fftfreq(32, d=1./32)  # get freqency domain for w
+  >>> w = spec_weight(freq, lp=2.)        # calculate low-pass response
+
+  >>> np.vstack([freq, w]).T              # doctest: +ELLIPSIS
+  array([[  0.        ,   1.        ],
+         [  1.        ,   0.91666667],
+         [  2.        ,   0.66666667],
+         [  3.        ,   0.33333333],
+         [  4.        ,   0.08333333],
+         [  5.        ,   0.        ],
+         ...
+         [ -6.        ,   0.        ],
+         [ -5.        ,   0.        ],
+         [ -4.        ,   0.08333333],
+         [ -3.        ,   0.33333333],
+         [ -2.        ,   0.66666667],
+         [ -1.        ,   0.91666667]])
+
   '''
   freqs = np.abs(freqs)  # Make filter symmetrical for negative frequencies.
+  bleed = int(bleed)
 
   # construct brick-wall response
   response = np.ones(freqs.size)
   if lp:
-    response[freqs > lp] = 0.
+    response[freqs > float(lp)] = 0.
   if hp:
-    response[freqs < hp] = 0.
+    response[freqs < float(hp)] = 0.
 
   # smooth spectrum to prevent ringing
   win, pad = np.hanning(bleed), np.ones(bleed)
