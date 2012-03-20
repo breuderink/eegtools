@@ -29,7 +29,7 @@ def windows(indices, offset, X):
   X : 2D array-like
     The continuous array from which windows of the horizontal axis
     are selected.
-  
+
   Returns
   -------
   out : nd_array
@@ -52,9 +52,9 @@ def windows(indices, offset, X):
   indices = np.atleast_1d(indices)
   start, end = offset
 
-  T = np.zeros((indices.size, X.shape[0], end-start)) * np.nan
+  T = np.zeros((indices.size, X.shape[0], end - start)) * np.nan
   for ti, i in enumerate(indices):
-    T[ti] = X[:,(i+start):(i+end)]
+    T[ti] = X[:, (i + start):(i + end)]
 
   return T
 
@@ -68,7 +68,7 @@ def spec(T, axis=0):
 
   Parameters
   ----------
-  T : ndarray 
+  T : ndarray
     Tensor containing data to be detrended.
   axis : int, optional
     Specifies the axis over which the spectrum is calculated.
@@ -95,7 +95,7 @@ def spec_weight(freqs, hp=None, lp=None, bleed=7):
 
   A simple spectral filter can be implemented by weighting the
   spectrum of a signal. This function returns a vector with spectrum
-  weights. 
+  weights.
 
   Parameters
   ----------
@@ -156,7 +156,7 @@ def spec_weight(freqs, hp=None, lp=None, bleed=7):
   # smooth spectrum to prevent ringing
   win, pad = np.hanning(bleed), np.ones(bleed)
   padded = np.hstack([pad * response[0], response, pad * response[-1]])
-  response = np.convolve(padded, win/np.sum(win), 'same')
+  response = np.convolve(padded, win / np.sum(win), 'same')
   return response[pad.size:-pad.size]
 
 
@@ -223,15 +223,15 @@ def cov_tens(T):
   '''
   T = np.atleast_2d(T)
   C = np.asarray([band_cov(T[:, i]) for i in range(T.shape[1])])
-  return C / T.shape[1]**2
+  return C / T.shape[1] ** 2
 
 
 def tile_tens3d(T, width=None):
   '''
-  Tile the slabs of a 3D tensor T. 
-  
-  Useful for visualization of stacks of arrays and 3D tensors. 
-  
+  Tile the slabs of a 3D tensor T.
+
+  Useful for visualization of stacks of arrays and 3D tensors.
+
   Parameters:
   -----------
   T : 3D array
@@ -246,7 +246,7 @@ def tile_tens3d(T, width=None):
   out : 2D array
     The tiled version of `T`. If `T` cannot completely cover `out`,
     the empty regions are filled with NaNs.
-    
+
   Examples:
   ---------
   >>> tile_tens3d(np.zeros((5, 2, 3)) + np.arange(5).reshape(-1, 1, 1))
@@ -257,13 +257,13 @@ def tile_tens3d(T, width=None):
   '''
   T = np.atleast_3d(T)
   n, ch, cw = T.shape
-  
+
   # calculate grid shape
   w = width if width else np.ceil(np.sqrt(n))
-  h = np.ceil(n/float(w))
+  h = np.ceil(n / float(w))
 
   # construct 2D tile matrix
-  R = np.vstack([T, np.nan * np.zeros((w*h - n, ch, cw))])
+  R = np.vstack([T, np.nan * np.zeros((w * h - n, ch, cw))])
   R = R.reshape(h, w, ch, cw)
   R = np.concatenate(R, axis=1)
   R = np.concatenate(R, axis=1)
