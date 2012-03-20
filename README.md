@@ -16,21 +16,22 @@ thoroughly tested, and probably existed in
 [semantic versioning](semver.org).
 
 
-## Planned features
+### Planned features:
+- Examples!
 - Importing of [BDF](http://www.biosemi.com/faq/file_format.htm) and
   [GDF](http://arxiv.org/abs/cs.DB/0608052) file formats.
 - Publication-ready visualisation of topographic activation (scalp plots)
 - PARAFAC tensor decomposition for summarization of tensors (higher order
   arrays).
 
-## 0.2
+### 0.2
 - Added various spatial filters (common spatial patterns), channel selection,
   whitening and the common average reference.
 - Added functions for feature extraction (windowing, spectral estimation,
   filtering, narrow-band covariance tensors).
 
-## 0.1
-- Included importers for public brain-computer interfacing (BCI) data sets,
+### 0.1
+- Included automatically downloading importers for public brain-computer interfacing (BCI) data sets,
   such as [BCI Competition
   3.4a](http://www.bbci.de/competition/iii/#data_set_iva), Reuderink's
   Affective Pacman and [Schalk's
