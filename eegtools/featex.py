@@ -165,20 +165,20 @@ def band_cov(bf):
   Rank-2 covariance matrix for matching DFT coefficients of sensors.
   Used in covtens().
 
-  Parameters:
-  -----------
+  Parameters
+  ----------
   bf : complex-valued array
     Entries of `bf` represent different channels, and hold a single,
     complex-valued frequency bin as generated with the DFT.
 
-  Returns:
-  --------
+  Returns
+  -------
   out : 2D real-valued array
     Channel-covariance matrix, containing the covariance within the
     DFT frequency bin for pairs of channels.
 
-  See also:
-  ---------
+  See also
+  --------
   cov_tens : calculate covariance tensor for DFT-ed windows.
   '''
   return np.real(np.outer(bf, bf.conj()))
@@ -197,17 +197,17 @@ def cov_tens(T):
   T : 2D array with shape (p x n)
     DFT-transformed window with `p` channels and window length `n`.
 
-  Returns:
-  --------
+  Returns
+  -------
   out: a 3D tensor with shape (n x p x p)
     Stacked covariance matrices per frequency bin.
 
-  See also:
-  ---------
+  See also
+  --------
   band_cov : covariance matrix for a single frequency bin.
 
-  Examples:
-  ---------
+  Examples
+  --------
   >>> p, n = 10, 128
   >>> X = np.random.randn(p, n)
   >>> T = cov_tens(np.fft.fft(X, axis=1))
@@ -232,8 +232,8 @@ def tile_tens3d(T, width=None):
 
   Useful for visualization of stacks of arrays and 3D tensors.
 
-  Parameters:
-  -----------
+  Parameters
+  ----------
   T : 3D array
     The tensor to be tiled. The first dimension is rearranged, the 2D
     relation of the latter two are preserved.
@@ -241,14 +241,14 @@ def tile_tens3d(T, width=None):
     Determines how many 2D slabs are tiled horizontally. Tiling
     continues on the row below.
 
-  Returns:
-  --------
+  Returns
+  -------
   out : 2D array
     The tiled version of `T`. If `T` cannot completely cover `out`,
     the empty regions are filled with NaNs.
 
-  Examples:
-  ---------
+  Examples
+  --------
   >>> tile_tens3d(np.zeros((5, 2, 3)) + np.arange(5).reshape(-1, 1, 1))
   array([[  0.,   0.,   0.,   1.,   1.,   1.,   2.,   2.,   2.],
          [  0.,   0.,   0.,   1.,   1.,   1.,   2.,   2.,   2.],
