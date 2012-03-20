@@ -33,8 +33,8 @@ thoroughly tested, and probably existed in
 ### 0.1
 - Included automatically downloading importers for public brain-computer interfacing (BCI) data sets,
   such as [BCI Competition
-  3.4a](http://www.bbci.de/competition/iii/#data_set_iva), Reuderink's
-  Affective Pacman and [Schalk's
+  3.4a](http://www.bbci.de/competition/iii/#data_set_iva), [Reuderink's
+  Affective Pacman](http://borisreuderink.nl/perm/affpac/) and [Schalk's
   Physiobank](http://www.physionet.org/pn4/eegmmidb/) datasets.
 - Added importer for EDF+ files including annotations.
 
