@@ -25,6 +25,7 @@ def test_spec():
     S = fe.spec(T, axis=ax)
     np.testing.assert_almost_equal(S, np.apply_along_axis(spec, ax, T))
 
+
 def test_spec_weight():
   freqs = np.fft.fftfreq(128, d=1./128)
   for bleed in [3, 7, 15, 30]:
