@@ -50,19 +50,19 @@ def test_spec_weight():
 
 def test_band_cov():
   p, n = 10, 256
-  tr_f = np.apply_along_axis(np.fft.rfft, 1, np.random.randn(p, n))
-  for freq in range(1, tr_f.shape[1]):
+  win_f = np.apply_along_axis(np.fft.rfft, 1, np.random.randn(p, n))
+  for freq in range(1, win_f.shape[1]):
     print 'freq:', freq
     # construct single-band data
-    tr_b = np.where(np.atleast_2d(np.arange(tr_f.shape[1]) == freq), tr_f, 0)
+    tr_b = np.where(np.atleast_2d(np.arange(win_f.shape[1]) == freq), win_f, 0)
     tr = np.apply_along_axis(np.fft.irfft, 1, tr_b)
 
     # calculate normal and DFT based covariance
-    Cf = fe.band_cov(tr_f[:,freq])
+    Cf = fe.band_cov(win_f[:,freq])
     C = np.cov(tr, bias=True)
 
     # normalize
-    k = 1. if freq == tr_f.shape[1] - 1 else 2.
+    k = 1. if freq == win_f.shape[1] - 1 else 2.
     k /= n ** 2
     print 'k=%.2g' % k
     np.testing.assert_almost_equal(k * Cf, C)

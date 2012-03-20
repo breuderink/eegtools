@@ -18,17 +18,17 @@ def windows(indices, offset, X):
   Parameters
   ----------
   indices : list or array with ints
-      The indices of X that are of interest for the window. The
-      indices do not necessarily have to indicate the begin or center
-      of the window, since offsets relative to the indices determine
-      the window placement.
+    The indices of X that are of interest for the window. The
+    indices do not necessarily have to indicate the begin or center
+    of the window, since offsets relative to the indices determine
+    the window placement.
   offset : tuple with ints (start, end)
-      The start and end of the window relative to the index of the
-      event. A negative start can be used for example to extract a
-      baseline before an event.
+    The start and end of the window relative to the index of the
+    event. A negative start can be used for example to extract a
+    baseline before an event.
   X : 2D array-like
-      The continuous array from which windows of the horizontal axis
-      are selected.
+    The continuous array from which windows of the horizontal axis
+    are selected.
   
   Returns
   -------
@@ -69,15 +69,20 @@ def spec(T, axis=0):
   Parameters
   ----------
   T : ndarray 
-      Tensor containing data to be detrended.
+    Tensor containing data to be detrended.
   axis : int, optional
-      Specifies the axis over which the spectrum is calculated.
+    Specifies the axis over which the spectrum is calculated.
 
   Returns
   -------
   out: ndarray
     Array similar to `T` where the time dimension is replace with
     it's frequency spectrum.
+
+  See also:
+  ---------
+  windows : extract windows from continuous data.
+  spec_weight : filter in the frequency domain.
   '''
   T = signal.detrend(T, axis=axis)
   win = np.hanning(T.shape[axis])
@@ -111,6 +116,11 @@ def spec_weight(freqs, hp=None, lp=None, bleed=7):
   out : ndarray
     Vector with weights for increasing frequencies, to be multiplied
     with real-valued DFT-ed data.
+
+  See also:
+  ---------
+  windows : extract windows from continuous data.
+  spec : calculate power spectrum.
 
   Examples
   --------
@@ -152,20 +162,52 @@ def spec_weight(freqs, hp=None, lp=None, bleed=7):
 
 def band_cov(bf):
   '''
-  Rank-2 covariance matrix for matching DFT coefficients of sensors. Used in
-  covtens().
+  Rank-2 covariance matrix for matching DFT coefficients of sensors.
+  Used in covtens().
+
+  Parameters:
+  -----------
+  bf : complex-valued array
+    Entries of `bf` represent different channels, and hold a single,
+    complex-valued frequency bin as generated with the DFT.
+
+  Returns:
+  --------
+  out : 2D real-valued array
+    Channel-covariance matrix, containing the covariance within the
+    DFT frequency bin for pairs of channels.
+
+  See also:
+  ---------
+  cov_tens : calculate covariance tensor for DFT-ed windows.
   '''
   return np.real(np.outer(bf, bf.conj()))
 
 
 def cov_tens(T):
   '''
-  Covariance tensor for real DFT-ed trial (p x n) matrix T. An (n x p x p)
-  tensor C is returned. The idea of constructing a tensor with covariance
-  matrices for classification was presented in [1].
+  Calculate per-frequency covariance.
 
-  Please note that T[0,:,:] is the covariance of the DC offset.
+  The idea of constructing a tensor with covariance matrices for
+  classification was presented in [1]. Please note that T[0,:,:] is
+  the covariance of the DC offset.
 
+  Parameters:
+  -----------
+  T : 2D array with shape (p x n)
+    DFT-transformed window with `p` channels and window length `n`.
+
+  Returns:
+  --------
+  out: a 3D tensor with shape (n x p x p)
+    Stacked covariance matrices per frequency bin.
+
+  See also:
+  ---------
+  band_cov : covariance matrix for a single frequency bin.
+
+  Examples:
+  ---------
   >>> p, n = 10, 128
   >>> X = np.random.randn(p, n)
   >>> T = cov_tens(np.fft.fft(X, axis=1))
@@ -173,8 +215,11 @@ def cov_tens(T):
   >>> C = np.cov(X, bias=True)
   >>> np.testing.assert_almost_equal(Sig, C)
 
-  [1] Jason Farquhar. A linear feature space for simultaneous learning of
-  spatio-spectral filters in BCI. Neural Networks, 22:1278--1285, 2009.
+  References
+  ----------
+  [1] Jason Farquhar. A linear feature space for simultaneous learning
+  of spatio-spectral filters in BCI. Neural Networks, 22:1278--1285,
+  2009.
   '''
   T = np.atleast_2d(T)
   C = np.asarray([band_cov(T[:, i]) for i in range(T.shape[1])])
@@ -183,9 +228,27 @@ def cov_tens(T):
 
 def tile_tens3d(T, width=None):
   '''
-  Tile the slabs of a 3D tensor T. Useful for visualization of stacks of
-  arrays. The width parameter determines the width of the tile grid.
+  Tile the slabs of a 3D tensor T. 
+  
+  Useful for visualization of stacks of arrays and 3D tensors. 
+  
+  Parameters:
+  -----------
+  T : 3D array
+    The tensor to be tiled. The first dimension is rearranged, the 2D
+    relation of the latter two are preserved.
+  width : int, optional
+    Determines how many 2D slabs are tiled horizontally. Tiling
+    continues on the row below.
 
+  Returns:
+  --------
+  out : 2D array
+    The tiled version of `T`. If `T` cannot completely cover `out`,
+    the empty regions are filled with NaNs.
+    
+  Examples:
+  ---------
   >>> tile_tens3d(np.zeros((5, 2, 3)) + np.arange(5).reshape(-1, 1, 1))
   array([[  0.,   0.,   0.,   1.,   1.,   1.,   2.,   2.,   2.],
          [  0.,   0.,   0.,   1.,   1.,   1.,   2.,   2.,   2.],
