@@ -16,10 +16,11 @@ def test_whitener_lowrank():
 
 
 def test_select_channels():
-  X = np.random.rand(40, 10)
+  X = np.random.rand(10, 100)
   for keep in [[0, 1, -3, 2], (np.arange(10) % 2 == 0).astype(bool)]:
-    np.testing.assert_equal(np.dot(X, sf.select_channels(X.shape[1], keep)), 
-      X[:, keep])
+    W = sf.select_channels(X.shape[0], keep)
+    print W.shape
+    np.testing.assert_equal(np.dot(W, X), X[keep])
 
 
 def test_car():
@@ -77,4 +78,4 @@ def test_csp():
   W_full = sf.csp_base(C_a, C_b)
   W = sf.csp(C_a, C_b, 7)
 
-  np.testing.assert_equal(W, W_full[:, [0, 1, 2, 3, -3, -2, -1]])
+  np.testing.assert_equal(W, W_full[[0, 1, 2, 3, -3, -2, -1]])
