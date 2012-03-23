@@ -7,10 +7,10 @@ import featex as fe
 
 def test_window():
   X = np.random.randn(3, 50)
-  W = fe.windows([10, 12], [-2, 3], X)
+  W, ii = fe.windows([0, 10, 12, 49], [-2, 3], X)
+  print W, ii
 
-  # FIXME: we don't define behaviour when the windows are partially within X.
-
+  np.testing.assert_almost_equal(ii, [10, 12])
   assert(W.shape[0] == 2)
   np.testing.assert_equal(W[0], X[:,8:13])
   np.testing.assert_equal(W[1], X[:,10:15])

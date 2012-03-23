@@ -25,23 +25,29 @@ def windows(indices, offset, X):
   offset : tuple with ints (start, end)
     The start and end of the window relative to the index of the
     event. A negative start can be used for example to extract a
-    baseline before an event.
+    baseline before an event. If a window is placed partially outside
+    of X, this window is ignored.
   X : 2D array-like
     The continuous array from which windows of the horizontal axis
     are selected.
 
   Returns
   -------
-  out : nd_array
+  W : nd_array
     A 3D array, with the first dimension indexing the different
     windows.
+  indices : array of ints
+    The subset of indices that point to valid windows.
 
   Examples
   --------
   >>> X = np.arange(60).reshape(2, 30)
-  >>> T = windows([10, 15, 20], [-2, 4], X)
+  >>> T, ii  = windows([0, 10, 15, 20], [-2, 4], X)
   >>> T.shape
   (3, 2, 6)
+
+  >>> ii
+  array([10, 15, 20])
 
   >>> T[0]
   array([[  8.,   9.,  10.,  11.,  12.,  13.],
@@ -49,14 +55,18 @@ def windows(indices, offset, X):
   '''
 
   # construct vector y and tensor T
-  indices = np.atleast_1d(indices)
-  start, end = offset
+  X = np.atleast_2d(X)
+  p, n = X.shape
+  ii = np.atleast_1d(indices)
+  begin, end = offset
 
-  T = np.zeros((indices.size, X.shape[0], end - start)) * np.nan
-  for ti, i in enumerate(indices):
-    T[ti] = X[:, (i + start):(i + end)]
+  ii = ii[np.logical_and(ii + begin >= 0, ii + end < n)]
 
-  return T
+  W = np.zeros((ii.size, p, end - begin)) * np.nan
+  for ti, i in enumerate(ii):
+    W[ti] = X[:, i + begin:i + end]
+
+  return W, ii
 
 
 def spec(T, axis=0):
