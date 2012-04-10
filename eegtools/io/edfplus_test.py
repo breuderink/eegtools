@@ -70,4 +70,5 @@ def test_load_edf():
   np.testing.assert_almost_equal(np.flatnonzero(X), np.arange(12) * 100)
 
   assert X.shape == (1, 1200)
+  assert X.dtype == np.float32
   assert sample_rate == 100.

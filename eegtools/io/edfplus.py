@@ -129,7 +129,7 @@ class BaseEDFReader:
         events.extend(ann[1:])
       else:
         # 2-byte little-endian integers
-        dig = np.fromstring(samples, '<i2').astype(float)
+        dig = np.fromstring(samples, '<i2').astype(np.float32)
         phys = (dig - dig_min[i]) * gain[i] + phys_min[i]
         signals.append(phys)
 
