@@ -156,7 +156,7 @@ def csp_base(C_a, C_b):
   -------
   W : array of shape (m, n)
     A matrix with m spatial filters with decreasing variance in the
-    first condition. The rank of (C_a + C_b) is determines the number
+    first condition. The rank of (C_a + C_b) determines the number
     of filters m.
 
   See also
