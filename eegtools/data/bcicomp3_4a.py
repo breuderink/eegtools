@@ -37,10 +37,10 @@ def load_mat(mat_train, mat_test, rec_id):
   mat = io.loadmat(mat_train, struct_as_record=True)
   mat_true = io.loadmat(mat_test, struct_as_record=True)
 
-
   # get simple info from MATLAB files
-  X, nfo, mrk = .1 * mat['cnt'].astype(float).T, mat['nfo'], mat['mrk']
-  X, nfo, mrk = X.astype(np.float32), nfo[0][0], mrk[0][0]
+  X = mat['cnt'].astype(np.float32).T * 0.1
+  nfo, mrk = mat['nfo'][0][0], mat['mrk'][0][0]
+
   sample_rate = float((nfo['fs'])[0][0])
   dt = np.ones(X.shape[1]-1) / sample_rate
   chan_lab = [str(c[0]) for c in nfo['clab'].flatten()]
