@@ -60,11 +60,8 @@ class ChanVar(base.BaseEstimator, base.TransformerMixin):
     return np.var(X, axis=2)  # X.shape = (trials, channels, time)
 
 
-pipe = pipeline.Pipeline([
-  ('csp', CSP()),
-  ('chan_var', ChanVar()),
-  ('svm', svm.SVC(kernel='linear')),
-  ])
+pipe = pipeline.Pipeline(
+  [('csp', CSP()), ('chan_var', ChanVar()), ('svm', svm.SVC(kernel='linear'))])
 
 # Create mask for same train and test data as used in competition:
 test = folds == 1
@@ -74,9 +71,8 @@ train = ~test
 pipe.fit(trials[train], y[train])
 
 # make predictions on unseen test data
-y_true = y[test]
 y_pred = pipe.predict(trials[test])
 
 # Show results. Competition results are available on
 # http://www.bbci.de/competition/iii/results/index.html#berlin1
-print metrics.classification_report(y_true, y_pred)
+print metrics.classification_report(y[test], y_pred)
