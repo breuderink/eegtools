@@ -4,15 +4,13 @@ import warnings
 import numpy as np
 
 '''
-EEGdata provides easy access to neurophysiological recordings, with
-brain-computer interface (BCI) research in mind. In short, a BCI is
-like speech recognition, but for brain signals.
+This modeule provides easy access to neurophysiological recordings, with
+brain-computer interface (BCI) research in mind. 
 
-The aim is to make publicly available datasets available to
-researchers by automatically downloading and parsing them, and provide
-the data in a no-frills format.
+The aim is to make publicly available datasets available to researchers
+by automatically downloading and parsing them, and provide the data in a
+simple, common format.
 '''
-
 
 CACHE_VAR = 'EEGTOOLS_DATA_CACHE'
 CACHE_PATH = '~/eegtools_data'
@@ -113,6 +111,7 @@ class Recording:
   @property
   def sample_rate(self):
     '''Estimate sample rate based on dt.'''
+    # FIXME: repeated call can cause a performance problem.
     dt = self.dt 
     return 1./np.median(dt[np.isfinite(dt)])
 
