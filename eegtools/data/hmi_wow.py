@@ -2,9 +2,19 @@
 import argparse, logging
 from collections import namedtuple
 import numpy as np
+from shared import Recording, data_source
+import eegtools.io
 
-# TODO: 
-# - diff scan_code and key_id?
+# TODO:
+# - How are the files named? The 'master' dir on HD seems different from S3.
+# - Link markers from log file to marker from EDF.
+
+__all__ = ['load', 'subjects']
+
+log = logging.getLogger(__name__)
+
+URL_TEMPLATE = 'https://s3-eu-west-1.amazonaws.com/bcidata.breuderink/' + \
+  'hmi_awow/hmi-awow_%s.%s'
 
 LOG_MOUSE_EVENTS = {
   512 : 'mouse movement',
@@ -107,9 +117,6 @@ EVENTS = {
   519: ('mouse scroll button pressed', 7),
   520: ('mouse scroll button released', 8),
   522: ('mouse scroll', 10)}
-   
-
-log = logging.getLogger(__name__)
 
 Event = namedtuple('Event', 'window desc time marker code x y wheel'.split())
 
@@ -140,6 +147,22 @@ def sanitize_logged_events(events):
 
 def events_to_array(events):
   return np.asarray([(e.code, e.time, e.time) for e in events]).T
+
+
+def load(subject_id, ds=data_source()):
+  # Get the events from the log.
+  log = ds.open(URL_TEMPLATE % (subject_id, 'log'))
+  E = events_to_array(sanitize_logged_events([line_to_event(l) for l in log]))
+
+  # Load the continuous recording.
+  edf = eegtools.io.load_edf(ds.open(URL_TEMPLATE % (subject_id, 'edf')))
+
+  # WIP for construction of recording:
+  eeg = slice(2, 16)
+  chan_lab = edf.chan_lab[eeg]
+  X = edf.X[eeg]
+  marker = edf.X[edf.chan_lab.index('MARKER')].astype(int)
+  return (E, edf, X, marker)
 
 
 if __name__ == '__main__':
