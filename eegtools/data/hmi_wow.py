@@ -141,12 +141,12 @@ def line_to_event(line):
 
 def sanitize_logged_events(events):
   events = sorted([e for e in events if e], key=lambda e: e.time)
-  events = [e for e in events if e.window == 'World of Warcraft']
   return events
 
 
 def events_to_array(events):
-  return np.asarray([(e.code, e.time, e.time) for e in events]).T
+  return np.asarray([(e.code, e.time, e.time, e.window == 'World of Warcraft', 
+    e.x, e.y, e.wheel) for e in events]).T.astype(np.float32)
 
 
 def load(subject_id, ds=data_source()):
