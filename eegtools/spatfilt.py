@@ -254,6 +254,5 @@ def csp(C_a, C_b, m):
          [ 0.  , -0.6 ,  0.  ,  0.37]])
   '''
   W = csp_base(C_a, C_b)
-  if W.shape[1] > m: 
-    return W[outer_n(m)]
-  return W
+  assert W.shape[1] >= m
+  return W[outer_n(m)]
