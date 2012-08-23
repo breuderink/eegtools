@@ -9,7 +9,7 @@ setup(
   version='0.2.1',
   requires=[ # FIXME does this work? docs seem inconsistent....
     'numpy(>=1.5.1)',
-    'scipy'
+    'scipy(>=0.8.0)'  # for loading datasets in .mat format
     ],
   packages=['eegtools', 'eegtools.io', 'eegtools.data'],
   )
