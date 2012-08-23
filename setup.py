@@ -1,15 +1,13 @@
 from distutils.core import setup
 
 setup(
-  name='EEGtools',
+  name='eegtools',
   url='https://github.com/breuderink/eegtools',
   author='Boris Reuderink',
   author_email='b.reuderink@gmail.com',
   license='BSD',
   version='0.2.1',
-  requires=[ # FIXME does this work? docs seem inconsistent....
-    'numpy(>=1.5.1)',
-    'scipy(>=0.8.0)'  # for loading datasets in .mat format
-    ],
+  # Needed for PIP, see http://stackoverflow.com/questions/8295644/:
+  install_requires=open('requirements.txt').readlines(),
   packages=['eegtools', 'eegtools.io', 'eegtools.data'],
   )
