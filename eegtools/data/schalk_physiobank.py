@@ -66,7 +66,6 @@ KNOWN_LABS = 'FC5 FC3 FC1 FCz FC2 FC4 FC6 C5 C3 C1 Cz C2 C4 C6 CP5 CP3 CP1 CPz\
 log = logging.getLogger(__name__)
 
 
-
 def gen_urls(subject, url_template=URL_TEMPLATE):
   '''Return EDF+ URLs for a given subject and template'''
   runs = np.arange(14) + 1
@@ -85,16 +84,17 @@ def load_schalk_run(edf, run):
     for label in texts:
       events.append(
         (task_dic[str(label)], start * fs, (start + duration) * fs))
-  return d, np.asarray(events, int).T
+  return d, np.asarray(events, int).T.reshape(3, -1)
 
 
 def clean_chan_lab(feat_lab):
-  '''Replace channel labels with matching, correctly capitalized labels'''
+  '''Replace channel labels with matching, correctly capitalized labels.'''
   lookup = dict((l.lower(), l) for l in KNOWN_LABS)
   return [lookup[l.strip('.').lower()] for l in feat_lab]
 
 
-def combine_events(events, block_lens):
+def concatenate_events(events, block_lens):
+  '''Concatenate events indexing different runs.'''
   def shift_events(events, offset):
       events = events.copy()
       events[1:] += offset
@@ -142,22 +142,22 @@ def load(subject, ds=data_source(), url_template=URL_TEMPLATE):
   The file headers for one subject all contain the same start
   timestamp, so we cannot estimate the time between runs. 
   '''
-
   urls, runs = gen_urls(subject, url_template)
   log.debug('Generated URLs: %s.' % (urls,))
   
+  # Load runs for this subject:
   rec = [load_schalk_run(ds.open(u), r) for (u, r) in zip(urls, runs)]
   runs, events = zip(*rec)
 
+  # Combine information from different runs:
   X = np.hstack([r.X.astype(np.float32) for r in runs])
-  sample_rate=runs[0].sample_rate
-  chan_lab=clean_chan_lab(runs[0].chan_lab)
-  folds = np.hstack([np.ones(E.shape[1], int) * i 
-    for (i, E) in enumerate(events)])
-  events = combine_events(events, [r.X.shape[1] for r in runs])
+  dt = np.hstack([block_dt(r.X.shape[1], r.sample_rate) for r in runs])[1:]
+  chan_lab = clean_chan_lab(runs[0].chan_lab)
+  folds = np.hstack([
+    np.ones(e.shape[1], int) * i for (i, e) in enumerate(events)])
+  E = concatenate_events(events, [r.X.shape[1] for r in runs])
 
-  dt = np.hstack([block_dt(r.X.shape[1], sample_rate) for r in runs])[1:]
 
-  return Recording(X=X, dt=dt, chan_lab=chan_lab, 
-    events=events, folds=folds, event_lab=EVENTS, 
-    rec_id='schalk-physiobank-s%d' % subject, license=LICENSE)
+  return Recording(X=X, dt=dt, chan_lab=chan_lab, events=E, folds=folds, 
+    event_lab=EVENTS, rec_id='schalk-physiobank-s%d' % subject, 
+    license=LICENSE)
