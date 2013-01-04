@@ -27,7 +27,7 @@ LOG_MOUSE_EVENTS = {
   522 : 'mouse scroll'}
 
 EVENTS = {
-  8: ('key pressed [Back]', 8),
+  8: ('key pressed [Back]', 8),  # Ambiguous marker!
   9: ('key pressed [Tab]', 9),
   13: ('key pressed [Return]', 13),
   20: ('key pressed [Capital]', 20),
@@ -115,8 +115,10 @@ EVENTS = {
   516: ('mouse right pressed', 4),
   517: ('mouse right released', 5),
   519: ('mouse scroll button pressed', 7),
-  520: ('mouse scroll button released', 8),
+  520: ('mouse scroll button released', 8),  # Ambiguous marker!
   522: ('mouse scroll', 10)}
+
+LOGTIMERES = 1e-3
 
 Event = namedtuple('Event', 'window desc time marker code x y wheel'.split())
 
@@ -126,15 +128,15 @@ def line_to_event(line):
   if field[-1] == 'key':
     time, marker, key_id, scan_code, key_name, _, window, _ = field
     return Event(window=window, desc='key pressed [%s]' % key_name, 
-      time=int(time), marker=int(marker), code=int(key_id), x=None, y=None, 
-      wheel=None)
+      time=int(time) * LOGTIMERES, marker=int(marker), code=int(key_id),
+      x=None, y=None, wheel=None)
     
   elif field[-1] == 'mouse':
     time, marker, code, pos, wheel, _, window, _ = field
     x, y = tuple(map(int, pos.strip('()').split(', ')))
     return Event(window=window, desc=LOG_MOUSE_EVENTS[int(code)],
-      time=int(time), marker=int(marker), code=int(code), x=x, y=y, 
-      wheel=int(wheel))
+      time=int(time) * LOGTIMERES, marker=int(marker), code=int(code), 
+      x=x, y=y, wheel=int(wheel))
   else:
     logging.error('Event not recognized: "%s"!' % line)
 
@@ -152,6 +154,7 @@ def events_to_array(events):
 def load(subject_id, ds=data_source()):
   # Get the events from the log.
   log = ds.open(URL_TEMPLATE % (subject_id, 'log'))
+
   E = events_to_array(sanitize_logged_events([line_to_event(l) for l in log]))
 
   # Load the continuous recording.
