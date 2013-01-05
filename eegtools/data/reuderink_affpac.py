@@ -4,9 +4,10 @@ import numpy as np
 from scipy import io
 from shared import Recording, data_source
 
-__all__ = ['load', 'subjects']
+__all__ = ['load', 'subjects', 'sessions']
 
-subjects = [i for i in range(12) if i not in [3, 8]]
+sessions = [i for i in range(12) if i not in [3, 8]]
+subjects = sessions  # Legacy name, since sessions is more accurate.
 
 URL_TEMPLATE = 'https://s3-eu-west-1.amazonaws.com/bcidata.breuderink/'\
   'reuderink_affpac/reuderink_affpac_s%d.mat.gz'

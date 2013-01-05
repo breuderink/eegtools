@@ -6,9 +6,10 @@ import numpy as np
 from scipy import io
 from shared import Recording, data_source
 
-__all__ = ['load', 'subjects']
+__all__ = ['load', 'subjects', 'sessions']
 
-subjects = 'aa al av aw ay'.split()
+sessions = 'aa al av aw ay'.split()
+subjects = sessions  # Legacy name, since sessions is more accurate.
 
 URL_TR = 'http://bbci.de/competition/download/'\
   'competition_iii/berlin/100Hz/data_set_IVa_%s_mat.zip'
@@ -31,6 +32,7 @@ Note that the above reference describes an older experimental setup. A new
 paper analyzing the data sets as provided in this competition and presenting
 the feedback results will appear soon.
 '''
+
 
 def load_mat(mat_train, mat_test, rec_id):
   '''Load BCI Comp. 3.4a specific Matlab files.'''

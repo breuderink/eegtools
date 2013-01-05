@@ -4,9 +4,10 @@ import numpy as np
 import eegtools.io
 from shared import Recording, data_source
 
-__all__ = ['load', 'subjects']
+__all__ = ['load', 'subjects', 'sessions']
 
-subjects = range(1, 110)
+sessions = range(1, 110)
+subjects = sessions  # Legacy name, since sessions is more accurate.
 
 LICENSE = '''This dataset was created and contributed to PhysioNet by
 the developers of the BCI2000 instrumentation system, which they used
