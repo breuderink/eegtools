@@ -14,15 +14,21 @@ I just have to vent... what a mess:
   ambiguous.
 '''
 
-# TODO:
-# - Add subject list.
-
 __all__ = ['load', 'subjects']
 log = logging.getLogger(__name__)
 LOGTIMERES = 1e-3
 
 URL_TEMPLATE = 'https://s3-eu-west-1.amazonaws.com/bcidata.breuderink/' + \
   'hmi_awow/hmi-awow_%s.%s'
+
+sessions = [
+  '1a-01', '1a-02', '1a-03', '1a-04', '1a-05', '1a-06', '1a-07', '1a-08',
+  '1a-08', '1a-09', '1a-10', ' 1b-11', '1b-12', '1b-13', '1b-14', '1b-15',
+  '1b-16', '1b-17', '1b-18', '1b-19', '1b-20', '2a-21', ' 2a-22', '2a-23',
+  '2a-24', '2a-25', '2a-26', '2a-27', '2a-28', '2a-29', '2a-30', '2a-31',
+  '2a-32', ' 2a-33', '2b-34', '2b-35', '2b-36', '2b-37', '2b-38', '2b-39',
+  '2b-40', '2b-41', '2b-42', '2b-43', ' 2b-44'
+  ]
 
 # These tuples link an text description to the code in the log file and a
 # corresponding marker. It is like a Rosetta stone. Unfortunately, a single

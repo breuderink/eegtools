@@ -1,4 +1,4 @@
 import schalk_physiobank
 import reuderink_affpac
 import bcicomp3_4a
-import hmi_awow
+import hmi_wow
