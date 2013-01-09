@@ -14,7 +14,7 @@ I just have to vent... what a mess:
   ambiguous.
 '''
 
-__all__ = ['load', 'subjects']
+__all__ = ['load', 'sessions']
 log = logging.getLogger(__name__)
 LOGTIMERES = 1e-3
 
