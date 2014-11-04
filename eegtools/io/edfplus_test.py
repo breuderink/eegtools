@@ -46,9 +46,11 @@ def test_edfplus_tal():
   mult_annotations = '+180\x14Lights off\x14Close door\x14\x00'
   with_duration = '+1800.2\x1525.5\x14Apnea\x14\x00'
   test_unicode = '+180\x14€\x14\x00\x00'
+  int_time = '+1800\x1525\x14Apnea\x14\x00'
 
   # test annotation with duration
   assert edfplus.tal(with_duration) == [(1800.2, 25.5, [u'Apnea'])]
+  assert edfplus.tal(int_time) == [(1800, 25, [u'Apnea'])]
 
   # test multiple annotations
   assert edfplus.tal('\x00' * 4 + with_duration * 3) == \
