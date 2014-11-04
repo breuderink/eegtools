@@ -25,7 +25,7 @@ def tal(tal_str):
   stream.
   '''
   exp = '(?P<onset>[+\-]\d+(?:\.\d*)?)' + \
-    '(?:\x15(?P<duration>\d+(?:\.\d*)))?' + \
+    '(?:\x15(?P<duration>\d+(?:\.\d*)?))?' + \
     '(\x14(?P<annotation>[^\x00]*))?' + \
     '(?:\x14\x00)'
 
