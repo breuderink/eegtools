@@ -1,14 +1,11 @@
 import re, datetime, operator, logging
 import numpy as np
 from collections import namedtuple
-from edfplus import tal
+from edfplus import tal, BaseEDFReader, EDFEndOfData
 
 log = logging.getLogger(__name__)
 
 EVENT_CHANNEL = 'BDF Annotations'
-
-class BDFEndOfData: pass
-
 
 def bdf_header(f):
   h = {}
@@ -51,11 +48,7 @@ def bdf_header(f):
   return h 
 
 
-class BaseBDFReader:
-  def __init__(self, file):
-    self.file = file
-
-
+class BaseBDFReader(BaseEDFReader):
   def read_header(self):
     self.header = h = bdf_header(self.file)
 
@@ -77,7 +70,7 @@ class BaseBDFReader:
     for nsamp in self.header['n_samples_per_record']:
       samples = self.file.read(nsamp * 3)
       if len(samples) != nsamp * 3:
-        raise BDFEndOfData
+        raise EDFEndOfData
       result.append(samples)
     return result
 
@@ -107,24 +100,9 @@ class BaseBDFReader:
         dig = (dig << 8).astype(np.int32) >> 8
 
         phys = (dig - dig_min[i]) * gain[i] + phys_min[i]
-        signals.append(phys)
+        signals.append(phys.astype(np.float32))
 
     return time, signals, events
-
-
-  def read_record(self):
-    return self.convert_record(self.read_raw_record())
-
-
-  def records(self):
-    '''
-    Record generator.
-    '''
-    try:
-      while True:
-        yield self.read_record()
-    except BDFEndOfData:
-      pass
 
 
 def load_bdf(bdffile):
