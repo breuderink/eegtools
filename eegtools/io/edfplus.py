@@ -107,8 +107,7 @@ class BaseEDFReader:
     '''Read a record with data and return a list containing arrays with raw
     bytes.
     '''
-    result = []
-    
+    result = []    
     for nsamp in self.header['n_samples_per_record']:
       samples = self.file.read(nsamp * 2)
       if len(samples) != nsamp * 2:
@@ -184,7 +183,7 @@ class BaseEDFReader:
       if offset >= self.header['n_records'] or offset < 0:
         raise EDFInvalidOffset("0 =< offset < %d, got %d" % (self.header['n_records'], offset))
       self.file.seek(self.header['n_header_bytes'] + offset * self.bytes_per_record)
-      while amount is None or record_num < offset + amount:
+      while amount is None or record_num < amount:
         yield self.read_record()
         record_num += 1
     except EDFEndOfData:
