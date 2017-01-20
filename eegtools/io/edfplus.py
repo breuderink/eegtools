@@ -12,7 +12,6 @@ Copyright (c) 2012 Boris Reuderink.
 
 import re, datetime, operator, logging
 import numpy as np
-import io
 from collections import namedtuple
 
 EVENT_CHANNEL = 'EDF Annotations'
