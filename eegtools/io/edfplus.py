@@ -19,6 +19,8 @@ log = logging.getLogger(__name__)
 
 class EDFEndOfData: pass
 
+class EDFInvalidOffset: pass
+
 
 def tal(tal_str):
   '''Return a list with (onset, duration, annotation) tuples for an EDF+ TAL
@@ -57,7 +59,7 @@ def edf_header(f):
     hour, minute, sec))
 
   # misc
-  header_nbytes = int(f.read(8))
+  h['n_header_bytes'] = header_nbytes = int(f.read(8))
   subtype = f.read(44)[:5]
   h['EDF+'] = subtype in ['EDF+C', 'EDF+D']
   h['contiguous'] = subtype != 'EDF+D'
@@ -105,6 +107,7 @@ class BaseEDFReader:
     bytes.
     '''
     result = []
+    
     for nsamp in self.header['n_samples_per_record']:
       samples = self.file.read(nsamp * 2)
       if len(samples) != nsamp * 2:
@@ -142,14 +145,51 @@ class BaseEDFReader:
 
   def records(self):
     '''
-    Record generator.
+    Record generator.     
     '''
     try:
       while True:
         yield self.read_record()
     except EDFEndOfData:
       pass
-
+    
+  
+  @property
+  def bytes_per_record(self):  
+    '''
+    Returns: 
+      (int) the number of bytes per each record 
+    ''' 
+    return sum([x * 2 for x in self.header['n_samples_per_record']])
+  
+    
+  def select_records(self, offset=0, amount=None):
+    '''
+    Record generator that efficiently fetches only selected records
+    
+    Args:
+      offset (int, optional): if set, start reading from given offset instead of
+        first record. Default is 0 (no offset)
+      amount (int, optional): if set, only read at most given amount of records,
+        otherwise return all records. If available records are fewer than 
+        requested, only available records are read. Default is None.
+        
+    Raises: 
+      EDFInvalidOffset: if offset is less than 0 or exceeds the number of
+        available records
+    '''
+    record_num = 0
+    try:
+      if offset >= self.header['n_records'] or offset < 0:
+        raise EDFInvalidOffset("0 =< offset < %d, got %d" % (self.header['n_records'], offset))
+      self.file.seek(self.header['n_header_bytes'])
+      self.file.seek(offset * self.bytes_per_record)
+      while amount is None or record_num < offset + amount:
+        yield self.read_record()
+        record_num += 1
+    except EDFEndOfData:
+      pass
+    
 
 def load_edf(edffile):
   '''Load an EDF+ file.

@@ -40,7 +40,18 @@ def test_with_generate_edf():
   # check .2 Hz block wave
   target = np.sin(.2 * np.pi * 2 * np.arange(1, block.size + 1) / fs[1]) >= 0
   assert np.max((block - target) ** 2) < 1e-4
-
+  
+  # check again with partial read - need to reopen file to reset cursor 
+  reader = edfplus.BaseEDFReader(
+    open(os.path.join(os.path.dirname(__file__), 
+    'data', 'sine3Hz_block0.2Hz.edf'), 'rb'))
+  reader.read_header()
+  recs = list(reader.select_records(offset=1, amount=1))
+  time = zip(*recs)[0]
+  signals = zip(*recs)[1]
+  assert len(signals[0][0]) == 100 * 10
+  assert len(signals[0][1]) == 12.8 * 10
+  
 
 def test_edfplus_tal():
   mult_annotations = '+180\x14Lights off\x14Close door\x14\x00'
