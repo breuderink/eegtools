@@ -12,6 +12,7 @@ Copyright (c) 2012 Boris Reuderink.
 
 import re, datetime, operator, logging
 import numpy as np
+import io
 from collections import namedtuple
 
 EVENT_CHANNEL = 'EDF Annotations'
@@ -182,8 +183,7 @@ class BaseEDFReader:
     try:
       if offset >= self.header['n_records'] or offset < 0:
         raise EDFInvalidOffset("0 =< offset < %d, got %d" % (self.header['n_records'], offset))
-      self.file.seek(self.header['n_header_bytes'])
-      self.file.seek(offset * self.bytes_per_record)
+      self.file.seek(self.header['n_header_bytes'] + offset * self.bytes_per_record)
       while amount is None or record_num < offset + amount:
         yield self.read_record()
         record_num += 1
