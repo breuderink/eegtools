@@ -19,6 +19,9 @@ def test_with_generate_edf():
   assert h['label'] == ['3Hz +5/-5 V', '0.2Hz Blk 1/0uV']
   assert h['units'] == ['V', 'uV']
   assert h['contiguous'] == True
+  assert h['n_header_bytes'] == 768
+  
+  assert reader.bytes_per_record == 2256
 
   fs = np.asarray(h['n_samples_per_record']) / h['record_length']
 
@@ -36,11 +39,24 @@ def test_with_generate_edf():
   sine, block = [np.hstack(s) for s in zip(*signals)]
   target = 5 * np.sin(3 * np.pi * 2 * np.arange(0, sine.size) / fs[0])
   assert np.max((sine - target) ** 2) < 1e-4
+  assert len(sine) == 110 * 100
 
   # check .2 Hz block wave
   target = np.sin(.2 * np.pi * 2 * np.arange(1, block.size + 1) / fs[1]) >= 0
   assert np.max((block - target) ** 2) < 1e-4
-
+  assert len(block) == 110 * 12.8
+    
+  # check again with partial read - need to reopen file to reset cursor 
+  partial_reader = edfplus.BaseEDFReader(
+    open(os.path.join(os.path.dirname(__file__), 
+    'data', 'sine3Hz_block0.2Hz.edf'), 'rb'))
+  partial_reader.read_header()
+  partial_recs = list(partial_reader.select_records(offset=2, amount=1))
+  partial_signals = zip(*partial_recs)[1]
+  partial_sine, partial_block = [np.hstack(s) for s in zip(*partial_signals)]
+  assert len(partial_sine) == 10 * 100
+  assert len(partial_block) == 10 * 12.8
+  
 
 def test_edfplus_tal():
   mult_annotations = '+180\x14Lights off\x14Close door\x14\x00'
